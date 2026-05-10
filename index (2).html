@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>neon-belarus-strategy-dashboard</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@500,700&display=swap" rel="stylesheet">
+  <style>
+    :root,[data-theme="light"]{--bg:#f7f6f2;--surface:#fbfaf7;--surface2:#f2efea;--text:#24211c;--muted:#6d6a64;--border:#d9d3ca;--primary:#01696f;--primary2:#dff2f2;--success:#437a22;--warn:#da7101;--shadow:0 12px 32px rgba(0,0,0,.08)}
+    [data-theme="dark"]{--bg:#141311;--surface:#1c1b19;--surface2:#242320;--text:#ece7df;--muted:#aca59c;--border:#3a3834;--primary:#53c4cf;--primary2:#20373a;--success:#7fca5d;--warn:#ffb04a;--shadow:0 18px 40px rgba(0,0,0,.38)}
+    *{box-sizing:border-box} body{margin:0;font-family:'Satoshi',sans-serif;background:radial-gradient(circle at top right, rgba(83,196,207,.1), transparent 22%),var(--bg);color:var(--text)}
+    .wrap{max-width:1440px;margin:0 auto;padding:20px}
+    .top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:18px}
+    h1,h2,h3{font-family:'Cabinet Grotesk',sans-serif;margin:0} h1{font-size:clamp(28px,3.8vw,46px)} h2{font-size:24px} h3{font-size:18px}
+    .sub{color:var(--muted);max-width:880px;margin-top:6px}
+    .btn{border:1px solid var(--border);background:var(--surface);color:var(--text);padding:11px 15px;border-radius:14px;cursor:pointer}
+    .layout{display:grid;grid-template-columns:320px 1fr;gap:18px}
+    .card{background:linear-gradient(180deg,var(--surface),var(--surface2));border:1px solid var(--border);border-radius:24px;box-shadow:var(--shadow)}
+    .panel{padding:18px}
+    .niches{display:grid;gap:10px;margin-top:14px}.niche{padding:14px;border:1px solid var(--border);border-radius:18px;background:var(--surface2);cursor:pointer;transition:.18s}
+    .niche.active{border-color:var(--primary);box-shadow:inset 0 0 0 1px var(--primary);background:var(--primary2)}
+    .muted{color:var(--muted)} .small{font-size:13px;color:var(--muted)}
+    .content{display:grid;gap:18px}
+    .tabs{display:flex;flex-wrap:wrap;gap:10px}.tab{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface);cursor:pointer}.tab.active{background:var(--primary);color:white;border-color:transparent}
+    .hero{display:grid;grid-template-columns:1.25fr .75fr;gap:18px}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}.kpi{padding:14px;border-radius:18px;background:var(--surface2);border:1px solid var(--border)} .val{font-size:28px;font-weight:700;margin-top:4px}
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:18px}.list{display:grid;gap:10px}.item{padding:14px;border-radius:18px;background:var(--surface2);border:1px solid var(--border)} .cover{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:18px;border:1px solid var(--border);margin-top:12px}.gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:16px;border:1px solid var(--border)}
+    .step{display:none}.step.active{display:block}
+    .table{width:100%;border-collapse:collapse;margin-top:10px}.table td,.table th{border-bottom:1px solid var(--border);padding:10px 8px;text-align:left}.badge{display:inline-block;padding:7px 10px;border-radius:999px;background:var(--primary2);color:var(--text);font-size:13px}
+    .bot-shell{display:grid;grid-template-columns:360px 1fr;gap:18px}.phone{padding:14px;background:#0f1012;border-radius:28px;border:1px solid #2b2b2d}.screen{min-height:640px;background:linear-gradient(180deg,#111214,#1b1f24);border-radius:20px;padding:14px;display:flex;flex-direction:column}.msgs{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px}.msg{max-width:85%;padding:11px 13px;border-radius:16px;font-size:14px;line-height:1.35;white-space:pre-wrap}.bot{background:#232830;color:#eef3f7;border-top-left-radius:6px}.user{background:#126b74;color:#fff;margin-left:auto;border-top-right-radius:6px}.opts{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.chip{padding:8px 10px;border-radius:999px;background:#262b30;color:#f1f5f7;border:1px solid rgba(255,255,255,.08);cursor:pointer;font-size:13px}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:flex;flex-direction:column;gap:6px}.field label{font-size:13px;color:var(--muted)} .field input,.field select{padding:12px;border-radius:14px;background:var(--surface2);border:1px solid var(--border);color:var(--text)}
+    @media (max-width: 1100px){.layout,.hero,.two,.bot-shell{grid-template-columns:1fr}.kpis{grid-template-columns:1fr 1fr}}
+    @media (max-width: 720px){.kpis{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Neon Belarus — интерактивный dashboard</h1>
+      <div class="sub">Пользователь выбирает нишу, затем проходит по 4 блокам: рынок, финансовые показатели, эффективность и маркетинговая целесообразность. Добавлены иллюстрации, ручной ввод данных и отдельный чат‑бот для расчёта стоимости и KPI.</div>
+    </div>
+    <button class="btn" id="themeBtn">Сменить тему</button>
+  </div>
+
+  <div class="layout">
+    <aside class="card panel">
+      <h2>Ниши</h2>
+      <div class="small">Выбор направления для анализа</div>
+      <div class="niches" id="niches"></div>
+      <div style="margin-top:16px" class="item">
+        <h3>Годовые данные</h3>
+        <div class="small">Остаток на начало: 24 772,14 BYN</div>
+        <div class="small">Обороты по дебету: 470 846,24 BYN</div>
+        <div class="small">Обороты по кредиту: 470 312,26 BYN</div>
+        <div class="small">Остаток на конец: 24 238,16 BYN</div>
+      </div>
+      <div style="margin-top:12px" class="item">
+        <h3>Разделы dashboard</h3>
+        <div class="small">1. Рынок</div>
+        <div class="small">2. Цифры</div>
+        <div class="small">3. Эффективность</div>
+        <div class="small">4. Маркетинговая целесообразность</div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="card panel hero">
+        <div>
+          <span class="badge" id="nicheBadge">Ниша</span>
+          <h2 id="nicheTitle" style="margin-top:8px"></h2>
+          <div class="sub" id="nicheDesc"></div>
+          <div class="kpis">
+            <div class="kpi"><div class="small">Размер рынка</div><div class="val" id="marketSize"></div></div>
+            <div class="kpi"><div class="small">Средний чек</div><div class="val" id="avgCheck"></div></div>
+            <div class="kpi"><div class="small">Потенц. заказов/мес</div><div class="val" id="ordersMonth"></div></div>
+            <div class="kpi"><div class="small">ROMI</div><div class="val" id="romiVal"></div></div>
+          </div>
+        </div>
+        <div class="item">
+          <h3>Почему эта ниша подходит</h3>
+          <div id="fitText" class="muted" style="margin-top:8px"></div>
+          <img id="nicheImage" class="cover" src="https://picsum.photos/seed/neon-market/900/520" alt="Иллюстрация ниши" width="900" height="520" loading="lazy">
+          <div class="gallery">
+            <img id="nicheImage2" src="https://picsum.photos/seed/neon-market-2/700/520" alt="Дополнительная иллюстрация 1" width="700" height="520" loading="lazy">
+            <img id="nicheImage3" src="https://picsum.photos/seed/neon-market-3/700/520" alt="Дополнительная иллюстрация 2" width="700" height="520" loading="lazy">
+          </div>
+        </div>
+      </section>
+
+      <section class="card panel">
+        <div class="tabs" id="tabs"></div>
+        <div id="steps"></div>
+      </section>
+
+      <section class="card panel bot-shell">
+        <div class="phone">
+          <div class="screen">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,.08);padding-bottom:10px">
+              <div>
+                <div style="color:#fff;font-weight:700">Neon Cost Bot</div>
+                <div style="font-size:12px;color:#aab2bb">Предварительный расчёт заказа</div>
+              </div>
+              <button class="chip" id="resetBot">Сброс</button>
+            </div>
+            <div class="msgs" id="msgs"></div>
+            <div class="opts" id="opts"></div>
+            <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px">
+              <input id="botFreeInput" type="text" inputmode="decimal" placeholder="Например: 2.7" style="background:#1b1e22;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;color:white">
+              <button class="chip" id="botSend">Ввести</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <h2>Отдельный бот и KPI</h2>
+          <div class="sub">Здесь можно отдельно считать себестоимость, цену продажи и ключевые KPI для практической главы.</div>
+          <div class="form-grid" style="margin-top:14px">
+            <div class="field"><label>Длина изделия, м</label><input id="bLength" type="number" step="0.1" value="2.5"></div>
+            <div class="field"><label>Высота, см</label><input id="bHeight" type="number" step="1" value="60"></div>
+            <div class="field"><label>Сложность</label><select id="bComplexity"><option value="1">Низкая</option><option value="1.25" selected>Средняя</option><option value="1.55">Высокая</option></select></div>
+            <div class="field"><label>Монтаж</label><select id="bInstall"><option value="0">Нет</option><option value="90" selected>Да</option></select></div>
+            <div class="field"><label>Материалы вручную, BYN</label><input id="manualMaterials" type="number" step="0.01" value="0"></div>
+            <div class="field"><label>Работа вручную, BYN</label><input id="manualLabor" type="number" step="0.01" value="0"></div>
+            <div class="field"><label>Накладные вручную, BYN</label><input id="manualOverhead" type="number" step="0.01" value="0"></div>
+            <div class="field"><label>Маркетинговый бюджет, BYN</label><input id="mBudget" type="number" step="1" value="1200"></div>
+            <div class="field"><label>Лиды в месяц</label><input id="leads" type="number" step="1" value="60"></div>
+            <div class="field"><label>Конверсия в продажу, %</label><input id="conv" type="number" step="0.1" value="18"></div>
+            <div class="field"><label>Ср. время обработки лида, мин</label><input id="leadTime" type="number" step="1" value="14"></div>
+          </div>
+          <div class="two" style="margin-top:16px">
+            <div class="item"><div class="small">Материалы</div><div class="val" id="botMaterials"></div></div>
+            <div class="item"><div class="small">Работа</div><div class="val" id="botLabor"></div></div>
+            <div class="item"><div class="small">Себестоимость</div><div class="val" id="botCost"></div></div>
+            <div class="item"><div class="small">Цена продажи</div><div class="val" id="botPrice"></div></div>
+            <div class="item"><div class="small">CAC</div><div class="val" id="cac"></div></div>
+            <div class="item"><div class="small">Прогноз выручки</div><div class="val" id="rev"></div></div>
+            <div class="item"><div class="small">ROMI</div><div class="val" id="romi"></div></div>
+            <div class="item"><div class="small">Сделок в месяц</div><div class="val" id="deals"></div></div>
+          </div>
+          <div class="item" style="margin-top:12px">
+            <h3>Пояснение KPI</h3>
+            <div class="muted" id="kpiExplain"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+<script>
+const niches = [
+  {
+    key:'wedding',
+    name:'Свадебный декор и фотозоны',
+    desc:'Неоновые надписи и световые композиции для свадеб, love-story и банкетных залов.',
+    fit:'Ниша сочетается с арендой и кастомным производством, а также даёт визуально сильный контент для соцсетей.',
+    market:['Спрос формируется свадебными агентствами, декораторами и самими молодожёнами.', 'Высокая роль эстетики, персонализации и коротких сроков изготовления.', 'Можно продавать как аренду, так и индивидуальное изготовление.'],
+    marketSize:'средний', avgCheck:280, orders:16, margin:0.47, budget:1100, conv:0.20, leadTime:10,
+    channels:['Instagram/Reels', 'Партнёрства с wedding-агентствами', 'Пакетные предложения для фотозон'],
+    risks:['Сезонность', 'Зависимость от свадебного сезона', 'Высокие ожидания к визуалу'],
+    rationale:'Ниша маркетингово целесообразна за счёт высокой визуальной вирусности, рекомендаций и возможности пакетной продажи нескольких элементов декора.',
+    image:'https://picsum.photos/seed/neon-wedding/900/520', image2:'https://picsum.photos/seed/neon-wedding-2/700/520', image3:'https://picsum.photos/seed/neon-wedding-3/700/520'
+  },
+  {
+    key:'retail',
+    name:'Ритейл и витрины магазинов',
+    desc:'Неоновые элементы для витрин, внутренних зон продаж и промо-оформления магазинов.',
+    fit:'Ниша опирается на существующие производственные компетенции компании и хорошо интегрируется в B2B-продажи.',
+    market:['Потребность связана с оформлением точек продаж и акционных зон.', 'Важны сроки, заметность и соответствие бренд-стилю.', 'Часто возможны повторные заказы в сезонные кампании.'],
+    marketSize:'высокий', avgCheck:510, orders:12, margin:0.48, budget:1600, conv:0.17, leadTime:19,
+    channels:['Прямые продажи', 'Коммерческие предложения', 'Портфолио для торговых объектов'],
+    risks:['Согласования с брендом', 'Требования к пожарной и электрической безопасности', 'Давление по цене'],
+    rationale:'Ниша даёт доступ к B2B-заказам со средним и высоким чеком и может стать стабильным направлением корпоративных продаж.',
+    image:'https://picsum.photos/seed/neon-retail/900/520', image2:'https://picsum.photos/seed/neon-retail-2/700/520', image3:'https://picsum.photos/seed/neon-retail-3/700/520'
+  },
+  {
+    key:'edu',
+    name:'Образовательные пространства и детские комнаты',
+    desc:'Неоновые изделия для учебных центров, детских студий, игровых зон и детских комнат.',
+    fit:'Ниша подходит для эмоционального визуального продукта с высокой персонализацией и относительно коротким циклом принятия решения.',
+    market:['Спрос поддерживается частными учебными центрами и родителями.', 'Ключевы факторы — безопасность, мягкий свет и персонализация.', 'Подходит для подарочного сегмента.'],
+    marketSize:'средний', avgCheck:190, orders:20, margin:0.43, budget:700, conv:0.23, leadTime:9,
+    channels:['Instagram', 'Партнёрства с детскими студиями', 'Каталог подарочных решений'],
+    risks:['Чувствительность к безопасности', 'Сильная зависимость от визуальной упаковки', 'Средний чек ниже B2B-сегмента'],
+    rationale:'Ниша интересна как массовый эмоциональный продукт с хорошей репутационной отдачей и высокой долей рекомендаций.',
+    image:'https://picsum.photos/seed/neon-kids/900/520', image2:'https://picsum.photos/seed/neon-kids-2/700/520', image3:'https://picsum.photos/seed/neon-kids-3/700/520'
+  },
+  {
+    key:'fashion',
+    name:'Одежда с элементами неоновых вывесок',
+    desc:'Капсульная одежда и сценические изделия с интеграцией гибких световых элементов и неоновой стилистики.',
+    fit:'Это инновационная ниша на стыке визуального дизайна, fashion и event-сегмента, которая может выделить бренд среди конкурентов.',
+    market:['Сегмент ориентирован на шоу, фестивали, фотосессии, промо-персонал и контент-креаторов.', 'Продукт ближе к лимитированным сериям и коллаборациям, чем к массовому производству.', 'Критичны дизайн, безопасность, питание и визуальный wow-эффект.'],
+    marketSize:'нишевый, но яркий', avgCheck:650, orders:8, margin:0.50, budget:1400, conv:0.13, leadTime:24,
+    channels:['Коллаборации с дизайнерами', 'Съёмки для соцсетей', 'Event и fashion-партнёрства'],
+    risks:['Более сложное производство', 'Требования к эргономике и безопасности', 'Необходимость тестирования прототипов'],
+    rationale:'Ниша подходит как имиджевый и PR-инструмент: она не обязана быть массовой, но может резко усилить узнаваемость бренда и дать сильный инфоповод.',
+    image:'https://picsum.photos/seed/neon-fashion/900/520', image2:'https://picsum.photos/seed/neon-fashion-2/700/520', image3:'https://picsum.photos/seed/neon-fashion-3/700/520'
+  },
+  {
+    key:'event',
+    name:'Ивент-аренда неона',
+    desc:'Аренда готовых неоновых вывесок для свадеб, фотозон, корпоративов и частных мероприятий.',
+    fit:'У компании уже есть направление аренды, договорная модель работы и сервис доставки, поэтому ниша требует минимального организационного входа.',
+    market:['Спрос формируется событиями: свадьбы, дни рождения, фотосессии и корпоративы.', 'Для аренды важны каталог готовых решений, быстрая бронь и доставка по Минску.', 'Сегмент удобен для повторных продаж и сезонных промо-акций.'],
+    marketSize:'средний', avgCheck:140, orders:26, margin:0.46, budget:800, conv:0.24, leadTime:8,
+    channels:['Instagram/Threads', 'Партнёрства с декораторами и event-агентствами', 'Посадочная страница с каталогом аренды'],
+    risks:['Сезонность', 'Пиковая загрузка в праздничные даты', 'Порча арендного фонда'],
+    rationale:'Ниша целесообразна, потому что позволяет быстрее получать лиды, имеет короткий цикл сделки и усиливает узнаваемость бренда через мероприятия.',
+    image:'https://picsum.photos/seed/neon-event/900/520', image2:'https://picsum.photos/seed/neon-event-2/700/520', image3:'https://picsum.photos/seed/neon-event-3/700/520'
+  },
+  {
+    key:'horeca',
+    name:'HoReCa и малый бизнес',
+    desc:'Пакетные решения для кофеен, баров, салонов красоты, барбершопов и шоурумов.',
+    fit:'Neon Belarus уже производит вывески под заказ, предлагает монтаж и доставку, что соответствует ожиданиям малого бизнеса при запуске точки.',
+    market:['Сегмент ищет визуально заметные решения для фасада и интерьера.', 'Важны сроки изготовления, единый подрядчик и понятная цена.', 'Есть потенциал повторных заказов при открытии новых точек.'],
+    marketSize:'высокий', avgCheck:420, orders:14, margin:0.49, budget:1500, conv:0.19, leadTime:18,
+    channels:['Контекстная реклама', 'Instagram-портфолио', 'Партнёрство с дизайнерами интерьера'],
+    risks:['Длительное согласование', 'Зависимость от открытия новых объектов', 'Требования к наружному размещению'],
+    rationale:'Ниша даёт более высокий средний чек и формирует B2B-портфолио, которое повышает доверие к бренду и облегчает последующие продажи.',
+    image:'https://picsum.photos/seed/neon-horeca/900/520', image2:'https://picsum.photos/seed/neon-horeca-2/700/520', image3:'https://picsum.photos/seed/neon-horeca-3/700/520'
+  },
+  {
+    key:'stream',
+    name:'Блогеры и стримеры',
+    desc:'Персонализированные вывески для домашних студий, стрим-комнат и контент-мейкеров.',
+    fit:'Продукт визуально эффектный и хорошо продаётся через соцсети, что совпадает с поведением этой аудитории.',
+    market:['Решение покупается как часть визуального образа канала или комнаты.', 'Высокую роль играет персонализация и быстрый просчёт.', 'Хорошо работают кейсы до/после и пользовательский контент.'],
+    marketSize:'средний', avgCheck:230, orders:18, margin:0.44, budget:900, conv:0.21, leadTime:11,
+    channels:['TikTok/Reels', 'Influencer-посевы', 'Лендинг-конструктор надписи'],
+    risks:['Чувствительность к цене', 'Импульсный спрос', 'Высокая зависимость от визуальной упаковки'],
+    rationale:'Ниша усиливает digital-присутствие Neon Belarus и подходит для продвижения через контент, отзывы и демонстрационные ролики.',
+    image:'https://picsum.photos/seed/neon-stream/900/520', image2:'https://picsum.photos/seed/neon-stream-2/700/520', image3:'https://picsum.photos/seed/neon-stream-3/700/520'
+  },
+  {
+    key:'franchise',
+    name:'Франшизы и сети',
+    desc:'Серийное изготовление вывесок по бренд-стандартам для сетевых точек и франчайзи.',
+    fit:'Компания может продавать не один заказ, а стандартный тираж по шаблону, снижая издержки на единицу и повышая предсказуемость загрузки.',
+    market:['Ключевое требование — единый стандарт качества и сроков.', 'Продажа строится через B2B-переговоры и пилотный запуск.', 'После первого контракта возможна серия повторных поставок.'],
+    marketSize:'точечный, но ёмкий', avgCheck:980, orders:6, margin:0.52, budget:1800, conv:0.12, leadTime:27,
+    channels:['Прямые продажи', 'Коммерческие предложения', 'Портфолио B2B-кейсов'],
+    risks:['Длинный цикл сделки', 'Высокие требования к стандарту', 'Риск зависимости от нескольких крупных клиентов'],
+    rationale:'Ниша сложнее по входу, но обеспечивает высокий средний чек, повторяемость заказов и более стабильную загрузку производства.',
+    image:'https://picsum.photos/seed/neon-franchise/900/520', image2:'https://picsum.photos/seed/neon-franchise-2/700/520', image3:'https://picsum.photos/seed/neon-franchise-3/700/520'
+  }
+];
+
+const tabs = [
+  {key:'market', title:'Рынок'},
+  {key:'numbers', title:'Цифры'},
+  {key:'eff', title:'Эффективность'},
+  {key:'marketing', title:'Маркетинговая целесообразность'}
+];
+let currentNiche = niches[0];
+function clampROMI(v){ return Math.max(-100, Math.min(150, v)); }
+let currentTab = 'market';
+const $ = s => document.querySelector(s);
+function money(v){return new Intl.NumberFormat('ru-RU',{maximumFractionDigits:2,minimumFractionDigits:2}).format(v)+' BYN'}
+function pct(v){return new Intl.NumberFormat('ru-RU',{maximumFractionDigits:1,minimumFractionDigits:1}).format(v)+'%'}
+function renderNiches(){
+  const root = $('#niches'); root.innerHTML='';
+  niches.forEach(n=>{ const d=document.createElement('div'); d.className='niche'+(n.key===currentNiche.key?' active':''); d.innerHTML='<strong>'+n.name+'</strong><div class="small" style="margin-top:4px">'+n.desc+'</div>'; d.onclick=()=>{currentNiche=n; renderAll(); const sec=document.querySelector('.tabs'); if(sec){ sec.scrollIntoView({behavior:'smooth', block:'start'}); }}; root.appendChild(d); });
+}
+function calcNiche(n){
+  const deals = Math.round(n.orders);
+  const revenue = deals * n.avgCheck;
+  const grossProfit = revenue * n.margin;
+  const romi = clampROMI(((grossProfit - n.budget) / n.budget) * 100);
+  const cac = n.budget / Math.max(1, Math.round(deals*n.conv + 1));
+  return {deals,revenue,grossProfit,romi,cac};
+}
+function renderHeader(){
+  const c = calcNiche(currentNiche);
+  $('#nicheBadge').textContent = currentNiche.name;
+  $('#nicheTitle').textContent = currentNiche.name;
+  $('#nicheDesc').textContent = currentNiche.desc;
+  $('#marketSize').textContent = currentNiche.marketSize;
+  $('#avgCheck').textContent = money(currentNiche.avgCheck);
+  $('#ordersMonth').textContent = currentNiche.orders;
+  $('#romiVal').textContent = pct(c.romi);
+  $('#fitText').textContent = currentNiche.fit;
+  $('#nicheImage').src = currentNiche.image;
+  $('#nicheImage').alt = currentNiche.name;
+  $('#nicheImage2').src = currentNiche.image2 || currentNiche.image;
+  $('#nicheImage2').alt = currentNiche.name + ' 2';
+  $('#nicheImage3').src = currentNiche.image3 || currentNiche.image;
+  $('#nicheImage3').alt = currentNiche.name + ' 3';
+}
+function renderTabs(){
+  const root = $('#tabs'); root.innerHTML='';
+  tabs.forEach(t=>{ const b=document.createElement('button'); b.className='tab'+(t.key===currentTab?' active':''); b.textContent=t.title; b.onclick=()=>{currentTab=t.key; renderSteps(); renderTabs(); const sec=document.querySelector('.tabs'); if(sec){ sec.scrollIntoView({behavior:'smooth', block:'start'}); }}; root.appendChild(b); });
+}
+function renderSteps(){
+  const c = calcNiche(currentNiche);
+  const root = $('#steps');
+  root.innerHTML = `
+    <div id="market-section" class="step ${currentTab==='market'?'active':''}">
+      <div class="two" style="margin-top:16px">
+        <div class="item"><h3>Рынок и спрос</h3><div class="list" style="margin-top:10px">${currentNiche.market.map(x=>'<div class="item">'+x+'</div>').join('')}</div></div>
+        <div class="item"><h3>Каналы продвижения</h3><div class="list" style="margin-top:10px">${currentNiche.channels.map(x=>'<div class="item">'+x+'</div>').join('')}</div><h3 style="margin-top:12px">Основные риски</h3><div class="list" style="margin-top:10px">${currentNiche.risks.map(x=>'<div class="item">'+x+'</div>').join('')}</div></div>
+      </div>
+    </div>
+    <div id="numbers-section" class="step ${currentTab==='numbers'?'active':''}">
+      <table class="table"><tr><th>Показатель</th><th>Значение</th></tr>
+      <tr><td>Средний чек</td><td>${money(currentNiche.avgCheck)}</td></tr>
+      <tr><td>Потенциальные заказы в месяц</td><td>${c.deals}</td></tr>
+      <tr><td>Прогноз выручки в месяц</td><td>${money(c.revenue)}</td></tr>
+      <tr><td>Валовая прибыль</td><td>${money(c.grossProfit)}</td></tr>
+      <tr><td>Маркетинговый бюджет</td><td>${money(currentNiche.budget)}</td></tr>
+      <tr><td>Ориентировочный CAC</td><td>${money(c.cac)}</td></tr>
+      </table>
+    </div>
+    <div id="eff-section" class="step ${currentTab==='eff'?'active':''}">
+      <div class="two" style="margin-top:16px">
+        <div class="item"><h3>Экономическая эффективность</h3><div class="list" style="margin-top:10px">
+          <div class="item">ROMI: ${pct(c.romi)}</div>
+          <div class="item">Средняя маржа: ${pct(currentNiche.margin*100)}</div>
+          <div class="item">Цикл обработки лида: ${currentNiche.leadTime} мин</div>
+          <div class="item">Конверсия в продажу: ${pct(currentNiche.conv*100)}</div>
+        </div></div>
+        <div class="item"><h3>Вывод по эффективности</h3><div class="muted" style="margin-top:10px">${c.romi > 0 ? 'Ниша показывает положительный маркетинговый возврат и может быть рекомендована для пилотного запуска.' : 'Ниша требует доработки каналов продвижения или сокращения бюджета, так как возврат маркетинговых инвестиций пока недостаточен.'}</div></div>
+      </div>
+    </div>
+    <div id="marketing-section" class="step ${currentTab==='marketing'?'active':''}">
+      <div class="item" style="margin-top:16px"><h3>Маркетинговая целесообразность</h3><div class="muted" style="margin-top:10px">${currentNiche.rationale}</div></div>
+      <div class="item" style="margin-top:12px"><h3>Как использовать в курсовой</h3><div class="muted" style="margin-top:10px">Для этой ниши можно обосновать целевую аудиторию, каналы коммуникации, прогноз лидов, конверсию, CAC, ROMI и сделать вывод о целесообразности внедрения как отдельного направления развития Neon Belarus.</div></div>
+    </div>`;
+}
+function renderAll(){renderNiches();renderHeader();renderTabs();renderSteps();}
+
+function calcBot(){
+  const length=parseFloat($('#bLength').value||0), height=parseFloat($('#bHeight').value||0), complexity=parseFloat($('#bComplexity').value||1), install=parseFloat($('#bInstall').value||0);
+  const manualMaterials=parseFloat($('#manualMaterials').value||0), manualLabor=parseFloat($('#manualLabor').value||0), manualOverhead=parseFloat($('#manualOverhead').value||0);
+  const mBudget=parseFloat($('#mBudget').value||0), leads=parseFloat($('#leads').value||0), conv=parseFloat($('#conv').value||0)/100, leadTime=parseFloat($('#leadTime').value||0);
+  let materials=length*92 + height*1.1 + 52 + 18;
+  let labor=length*48*complexity + height*0.45;
+  let overhead=(materials+labor)*0.18;
+  if(manualMaterials>0) materials=manualMaterials;
+  if(manualLabor>0) labor=manualLabor;
+  if(manualOverhead>0) overhead=manualOverhead;
+  const cost=materials+labor+overhead+install;
+  const price=cost*2;
+  const deals=Math.max(1, Math.round(leads*conv));
+  const revenue=deals*price;
+  const grossProfit=(price-cost)*deals;
+  const cac=mBudget/deals;
+  const romi=clampROMI(((grossProfit-mBudget)/Math.max(1,mBudget))*100);
+  $('#botMaterials').textContent=money(materials); $('#botLabor').textContent=money(labor); $('#botCost').textContent=money(cost); $('#botPrice').textContent=money(price); $('#cac').textContent=money(cac); $('#rev').textContent=money(revenue); $('#romi').textContent=pct(romi); $('#deals').textContent=deals;
+  $('#kpiExplain').textContent='Цена продажи рассчитывается как себестоимость × 2. KPI для курсовой: CAC = маркетинговый бюджет / количество сделок; ROMI = (маржинальный доход - маркетинговые затраты) / маркетинговые затраты × 100%; время обработки лида показывает скорость реакции на заявку.';
+  return {materials,labor,cost,price,deals,revenue,romi};
+}
+['#bLength','#bHeight','#bComplexity','#bInstall','#manualMaterials','#manualLabor','#manualOverhead','#mBudget','#leads','#conv','#leadTime'].forEach(id=>$(id).addEventListener('input',calcBot));
+
+const msgs=$('#msgs'), opts=$('#opts'); let step=0; const botState={};
+function addMsg(t,w='bot'){const d=document.createElement('div'); d.className='msg '+w; d.textContent=t; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight;}
+function setOpts(arr){opts.innerHTML=''; arr.forEach(x=>{const b=document.createElement('button'); b.className='chip'; b.textContent=x; b.onclick=()=>choose(x); opts.appendChild(b);});}
+function startBot(){msgs.innerHTML=''; step=0; addMsg('Здравствуйте! Выберите тип продукта для расчёта.'); setOpts(['Вывеска для бизнеса','Аренда на мероприятие','Домашняя вывеска']);}
+function choose(v){addMsg(v,'user'); if(step===0){botState.type=v; addMsg('Укажите длину изделия.'); setOpts(['1.5 м','2.5 м','3.5 м']); step=1;}
+ else if(step===1){botState.length=parseFloat(v); $('#bLength').value=botState.length; addMsg('Выберите сложность дизайна.'); setOpts(['Низкая','Средняя','Высокая']); step=2;}
+ else if(step===2){$('#bComplexity').value=v==='Низкая'?1:(v==='Средняя'?1.25:1.55); addMsg('Нужен монтаж?'); setOpts(['Да','Нет']); step=3;}
+ else if(step===3){$('#bInstall').value=v==='Да'?90:0; const r=calcBot(); addMsg('Предварительная себестоимость: '+money(r.cost)+'\nЦена продажи: '+money(r.price)+'\nПрогнозируемая результативность при текущих KPI доступна справа.'); setOpts(['Новый расчёт']); step=4;}
+ else {startBot();}
+ calcBot();
+}
+$('#resetBot').onclick=startBot;
+$('#themeBtn').onclick=()=>{const root=document.documentElement; root.setAttribute('data-theme', root.getAttribute('data-theme')==='dark'?'light':'dark');};
+renderAll(); calcBot(); startBot();
+</script>
+</body>
+</html>
